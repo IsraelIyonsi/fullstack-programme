@@ -1,0 +1,634 @@
+<title>Cohort Dashboard: Design</title>
+
+<style>
+  :root {
+    --ink: #10141A; --ink-2: #39424F; --mute: #6B7482; --faint: #99A1AE;
+    --line: #E1E5EB; --line-2: #EDF0F4;
+    --bg: #F4F6F8; --surface: #FFFFFF; --surface-2: #FAFBFC;
+    --accent: #2F6FED; --accent-soft: #E6EDFD; --accent-deep: #1B47A8;
+
+    --ok: #1F8A52; --ok-bg: #E3F3EA;
+    --wait: #2F6FED; --wait-bg: #E6EDFD;
+    --warn: #B5810B; --warn-bg: #FBF0D8;
+    --bad: #C13C3C; --bad-bg: #FBE6E6;
+    --idle: #C9CFD8; --idle-bg: #EDF0F4;
+
+    --display: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --r: 5px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #EAEEF4; --ink-2: #AFB8C5; --mute: #7C8593; --faint: #616A78;
+      --line: #242A34; --line-2: #1B212A;
+      --bg: #0A0D12; --surface: #11161D; --surface-2: #151B23;
+      --accent: #6E9BFF; --accent-soft: #17243C; --accent-deep: #9BB9FF;
+      --ok: #4CBE84; --ok-bg: #10281C; --wait: #6E9BFF; --wait-bg: #17243C;
+      --warn: #DFAD3A; --warn-bg: #2C2311; --bad: #E86767; --bad-bg: #2E1516;
+      --idle: #333B47; --idle-bg: #1A2029;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #EAEEF4; --ink-2: #AFB8C5; --mute: #7C8593; --faint: #616A78;
+    --line: #242A34; --line-2: #1B212A;
+    --bg: #0A0D12; --surface: #11161D; --surface-2: #151B23;
+    --accent: #6E9BFF; --accent-soft: #17243C; --accent-deep: #9BB9FF;
+    --ok: #4CBE84; --ok-bg: #10281C; --wait: #6E9BFF; --wait-bg: #17243C;
+    --warn: #DFAD3A; --warn-bg: #2C2311; --bad: #E86767; --bad-bg: #2E1516;
+    --idle: #333B47; --idle-bg: #1A2029;
+  }
+  :root[data-theme="light"] {
+    --ink: #10141A; --ink-2: #39424F; --mute: #6B7482; --faint: #99A1AE;
+    --line: #E1E5EB; --line-2: #EDF0F4;
+    --bg: #F4F6F8; --surface: #FFFFFF; --surface-2: #FAFBFC;
+    --accent: #2F6FED; --accent-soft: #E6EDFD; --accent-deep: #1B47A8;
+    --ok: #1F8A52; --ok-bg: #E3F3EA; --wait: #2F6FED; --wait-bg: #E6EDFD;
+    --warn: #B5810B; --warn-bg: #FBF0D8; --bad: #C13C3C; --bad-bg: #FBE6E6;
+    --idle: #C9CFD8; --idle-bg: #EDF0F4;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--display); font-size: 14px; -webkit-font-smoothing: antialiased;
+  }
+  .frame { max-width: 1320px; margin: 0 auto; padding: 20px 20px 60px; }
+
+  /* ---------- page intro ---------- */
+  .intro { padding: 34px 0 26px; border-bottom: 1px solid var(--line); margin-bottom: 22px; }
+  .intro .eyebrow {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600; margin-bottom: 12px;
+  }
+  .intro h1 { font-size: clamp(1.8rem, 3.6vw, 2.6rem); letter-spacing: -.03em; margin: 0 0 12px; font-weight: 700; }
+  .intro p { margin: 0; color: var(--ink-2); max-width: 66ch; line-height: 1.55; }
+
+  /* ---------- app chrome ---------- */
+  .app { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); box-shadow: 0 1px 2px rgba(16,20,26,.04), 0 12px 32px rgba(16,20,26,.06); }
+  .topbar {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    padding: 12px 18px; border-bottom: 1px solid var(--line); background: var(--surface-2);
+  }
+  .logo { font-weight: 700; letter-spacing: -.02em; display: flex; align-items: center; gap: 9px; }
+  .logo .sq { width: 20px; height: 20px; border-radius: 4px; background: var(--accent); display: grid; place-items: center; color: #fff; font-family: var(--mono); font-size: 11px; font-weight: 700; }
+  .cohort-pick {
+    font-family: var(--mono); font-size: 12px; color: var(--ink-2);
+    border: 1px solid var(--line); background: var(--surface); border-radius: var(--r);
+    padding: 6px 10px; display: flex; gap: 8px; align-items: center;
+  }
+  .cohort-pick b { color: var(--ink); }
+  .spacer { flex: 1; }
+  .tabs { display: flex; gap: 2px; }
+  .tab {
+    font: inherit; font-size: 12.5px; font-weight: 600;
+    border: 1px solid transparent; background: none; color: var(--mute);
+    padding: 7px 13px; border-radius: var(--r); cursor: pointer;
+  }
+  .tab:hover { color: var(--ink); background: var(--line-2); }
+  .tab[aria-selected="true"] { background: var(--accent-soft); color: var(--accent-deep); border-color: color-mix(in srgb, var(--accent) 30%, transparent); }
+  .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .who { display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: var(--ink-2); }
+  .av { width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-deep); display: grid; place-items: center; font-size: 11px; font-weight: 700; }
+
+  .view { display: none; }
+  .view.on { display: block; }
+
+  /* ---------- kpis ---------- */
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(158px, 1fr)); border-bottom: 1px solid var(--line); }
+  .kpi { padding: 16px 18px 18px; border-right: 1px solid var(--line); }
+  .kpi:last-child { border-right: 0; }
+  .kpi .l { font-family: var(--mono); font-size: 10px; letter-spacing: .13em; text-transform: uppercase; color: var(--mute); display: block; margin-bottom: 8px; }
+  .kpi .v { font-size: 1.72rem; font-weight: 700; letter-spacing: -.035em; font-variant-numeric: tabular-nums; line-height: 1; }
+  .kpi .d { font-size: 11.5px; color: var(--mute); margin-top: 7px; display: flex; align-items: center; gap: 6px; }
+  .kpi .v.alert { color: var(--bad); }
+  .kpi .v.good { color: var(--ok); }
+  .spark { display: block; margin-top: 9px; }
+
+  /* ---------- layout ---------- */
+  .body { display: grid; grid-template-columns: 1fr 320px; }
+  @media (max-width: 980px) { .body { grid-template-columns: 1fr; } }
+  .main { border-right: 1px solid var(--line); min-width: 0; }
+  .side { background: var(--surface-2); min-width: 0; }
+
+  .sect-head {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 13px 18px; border-bottom: 1px solid var(--line);
+  }
+  .sect-head h2 { font-size: 13px; margin: 0; letter-spacing: -.01em; }
+  .sect-head .sub { font-family: var(--mono); font-size: 11px; color: var(--mute); }
+  .chipbar { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
+  .chip {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase;
+    padding: 4px 8px; border-radius: 3px; border: 1px solid var(--line); color: var(--mute); background: var(--surface);
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .chip i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+
+  /* ---------- matrix ---------- */
+  .matrixwrap { overflow-x: auto; }
+  table.matrix { border-collapse: collapse; width: 100%; min-width: 900px; }
+  table.matrix th, table.matrix td { padding: 0; }
+  table.matrix thead th {
+    position: sticky; top: 0; background: var(--surface); z-index: 2;
+    font-family: var(--mono); font-size: 9.5px; font-weight: 600; color: var(--mute);
+    padding: 9px 0 8px; border-bottom: 1px solid var(--line); text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  table.matrix thead th.name { text-align: left; padding-left: 18px; letter-spacing: .12em; }
+  table.matrix tbody tr:hover td { background: var(--surface-2); }
+  td.name {
+    padding: 0 10px 0 18px; border-bottom: 1px solid var(--line-2); white-space: nowrap;
+    width: 210px; min-width: 210px;
+  }
+  td.name .row { display: flex; align-items: center; gap: 9px; height: 38px; }
+  td.name .nm { font-size: 12.5px; font-weight: 600; }
+  td.name .tag { font-family: var(--mono); font-size: 9px; padding: 2px 5px; border-radius: 3px; letter-spacing: .06em; }
+  .tag.risk { background: var(--bad-bg); color: var(--bad); }
+  .tag.quiet { background: var(--warn-bg); color: var(--warn); }
+  td.cellw { border-bottom: 1px solid var(--line-2); text-align: center; }
+  .cell {
+    width: 15px; height: 15px; border-radius: 3px; display: inline-block;
+    background: var(--idle-bg); border: 1px solid transparent;
+  }
+  .cell.graded { background: var(--ok); }
+  .cell.gradedlow { background: color-mix(in srgb, var(--ok) 42%, var(--warn)); }
+  .cell.submitted { background: var(--wait); }
+  .cell.late { background: var(--warn); }
+  .cell.missing { background: var(--bad); }
+  .cell.future { background: var(--idle-bg); border-color: var(--line); }
+  td.score { border-bottom: 1px solid var(--line-2); text-align: right; padding-right: 18px; font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; font-weight: 600; }
+  td.score .pct { color: var(--mute); font-weight: 400; font-size: 11px; }
+
+  /* ---------- side panels ---------- */
+  .panel { border-bottom: 1px solid var(--line); }
+  .panel .ph {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 13px 16px; border-bottom: 1px solid var(--line);
+  }
+  .panel .ph h3 { font-size: 12px; margin: 0; letter-spacing: -.005em; }
+  .count { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; background: var(--accent-soft); color: var(--accent-deep); }
+  .count.bad { background: var(--bad-bg); color: var(--bad); }
+  .queue { list-style: none; margin: 0; padding: 0; }
+  .queue li { padding: 11px 16px; border-bottom: 1px solid var(--line-2); display: flex; gap: 11px; align-items: flex-start; }
+  .queue li:last-child { border-bottom: 0; }
+  .queue .av { flex: none; }
+  .queue .t { font-size: 12.5px; font-weight: 600; line-height: 1.3; }
+  .queue .m { font-family: var(--mono); font-size: 10.5px; color: var(--mute); margin-top: 3px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .queue .m .late { color: var(--warn); }
+  .btn {
+    font: inherit; font-size: 11.5px; font-weight: 600; cursor: pointer;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    padding: 5px 11px; border-radius: var(--r); margin-left: auto; white-space: nowrap;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent-deep); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: var(--accent-deep); border-color: var(--accent-deep); color: #fff; }
+  .risk-item { padding: 12px 16px; border-bottom: 1px solid var(--line-2); }
+  .risk-item:last-child { border-bottom: 0; }
+  .risk-item .rt { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; }
+  .sev { width: 3px; align-self: stretch; border-radius: 2px; }
+  .risk-item p { margin: 5px 0 0; font-size: 11.5px; color: var(--ink-2); line-height: 1.42; }
+  .risk-row { display: flex; gap: 10px; }
+
+  /* ---------- marking sheet ---------- */
+  .mark-grid { display: grid; grid-template-columns: 1fr 340px; }
+  @media (max-width: 980px) { .mark-grid { grid-template-columns: 1fr; } }
+  .mark-main { border-right: 1px solid var(--line); min-width: 0; }
+  .sub-head { padding: 18px; border-bottom: 1px solid var(--line); }
+  .sub-head .who-line { display: flex; align-items: center; gap: 11px; margin-bottom: 12px; }
+  .sub-head h2 { font-size: 1.15rem; margin: 0; letter-spacing: -.02em; }
+  .sub-head .meta { font-family: var(--mono); font-size: 11px; color: var(--mute); margin-top: 3px; }
+  .links { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .link {
+    font-family: var(--mono); font-size: 11px; text-decoration: none; color: var(--accent-deep);
+    border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent); background: var(--accent-soft);
+    padding: 6px 10px; border-radius: var(--r);
+  }
+  .link:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+  .crit { padding: 16px 18px 20px; border-bottom: 1px solid var(--line); }
+  .crit h3 { font-size: 12px; margin: 0 0 4px; }
+  .crit .hint { font-size: 11.5px; color: var(--mute); margin: 0 0 14px; }
+  .crit ul { list-style: none; margin: 0; padding: 0; }
+  .crit li { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0; border-bottom: 1px solid var(--line-2); font-size: 12.5px; line-height: 1.4; }
+  .crit li:last-child { border-bottom: 0; }
+  .box { width: 15px; height: 15px; border-radius: 3px; border: 1.4px solid var(--faint); flex: none; margin-top: 1px; display: grid; place-items: center; }
+  .box.met { background: var(--ok); border-color: var(--ok); color: #fff; font-size: 10px; font-weight: 700; }
+  .box.no { border-color: var(--bad); color: var(--bad); font-size: 10px; font-weight: 700; }
+  .crit li.failed { color: var(--ink); }
+  .crit li code { font-family: var(--mono); font-size: 11px; background: var(--line-2); padding: 1px 4px; border-radius: 3px; }
+  .crit .note { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--bad); background: var(--bad-bg); padding: 2px 6px; border-radius: 3px; white-space: nowrap; }
+
+  .rubric { padding: 16px 18px; }
+  .rubric h3 { font-size: 12px; margin: 0 0 14px; }
+  .dim { margin-bottom: 15px; }
+  .dim .dl { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .dim .dn { font-size: 12.5px; font-weight: 600; }
+  .dim .dd { font-size: 11px; color: var(--mute); }
+  .dim .dv { font-family: var(--mono); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .pips { display: flex; gap: 4px; }
+  .pip { flex: 1; height: 7px; border-radius: 2px; background: var(--line-2); }
+  .pip.on { background: var(--accent); }
+  .pip.on.low { background: var(--warn); }
+  .verdict { display: flex; gap: 7px; margin: 4px 0 16px; }
+  .vopt {
+    font: inherit; font-size: 11.5px; font-weight: 600; cursor: pointer; flex: 1;
+    padding: 8px; border-radius: var(--r); border: 1px solid var(--line); background: var(--surface); color: var(--mute);
+  }
+  .vopt[aria-pressed="true"].pass { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
+  .vopt[aria-pressed="true"].resub { background: var(--warn-bg); border-color: var(--warn); color: var(--warn); }
+  .fb { width: 100%; min-height: 92px; font: inherit; font-size: 12.5px; line-height: 1.5; padding: 11px; border-radius: var(--r); border: 1px solid var(--line); background: var(--surface); color: var(--ink); resize: vertical; }
+  .fb:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .total { display: flex; align-items: baseline; justify-content: space-between; padding: 12px 0 14px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-bottom: 15px; }
+  .total .tl { font-family: var(--mono); font-size: 10px; letter-spacing: .13em; text-transform: uppercase; color: var(--mute); }
+  .total .tv { font-size: 1.5rem; font-weight: 700; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+  .actions { display: flex; gap: 8px; }
+  .actions .btn { margin-left: 0; flex: 1; text-align: center; padding: 9px; }
+
+  /* ---------- student detail ---------- */
+  .sd-head { padding: 20px 18px; border-bottom: 1px solid var(--line); display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .av.lg { width: 46px; height: 46px; font-size: 16px; }
+  .sd-head h2 { margin: 0; font-size: 1.2rem; letter-spacing: -.02em; }
+  .sd-head .meta { font-family: var(--mono); font-size: 11px; color: var(--mute); margin-top: 4px; }
+  .sd-stats { display: flex; gap: 0; margin-left: auto; }
+  .sd-stats div { padding: 0 18px; border-left: 1px solid var(--line); text-align: right; }
+  .sd-stats .v { font-size: 1.2rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .sd-stats .l { font-family: var(--mono); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--mute); margin-top: 4px; }
+  .trend { padding: 18px; border-bottom: 1px solid var(--line); }
+  .trend h3 { font-size: 12px; margin: 0 0 3px; }
+  .trend .sub { font-size: 11.5px; color: var(--mute); margin: 0 0 14px; }
+  .timeline { list-style: none; margin: 0; padding: 0; }
+  .timeline li { display: grid; grid-template-columns: 62px 1fr auto; gap: 14px; align-items: center; padding: 10px 18px; border-bottom: 1px solid var(--line-2); }
+  .timeline .wk { font-family: var(--mono); font-size: 10.5px; color: var(--mute); font-weight: 600; }
+  .timeline .tt { font-size: 12.5px; font-weight: 600; }
+  .timeline .ts { font-size: 11px; color: var(--mute); margin-top: 2px; }
+  .pill { font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: 10px; letter-spacing: .04em; font-weight: 600; white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn); }
+  .pill.bad { background: var(--bad-bg); color: var(--bad); }
+  .pill.wait { background: var(--wait-bg); color: var(--accent-deep); }
+
+  /* ---------- schema strip ---------- */
+  .under { margin-top: 34px; border-top: 1px solid var(--line); padding-top: 30px; }
+  .under h2 { font-size: 1.15rem; letter-spacing: -.02em; margin: 0 0 6px; }
+  .under > p { color: var(--ink-2); max-width: 62ch; margin: 0 0 22px; line-height: 1.55; }
+  .tables { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(216px, 1fr)); }
+  .tbl { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+  .tbl .tn { font-family: var(--mono); font-size: 11px; font-weight: 700; padding: 8px 11px; background: var(--surface-2); border-bottom: 1px solid var(--line); color: var(--accent-deep); }
+  .tbl ul { list-style: none; margin: 0; padding: 8px 11px 10px; }
+  .tbl li { font-family: var(--mono); font-size: 10.5px; color: var(--ink-2); padding: 2px 0; }
+  .tbl li .k { color: var(--warn); }
+  .tbl li .f { color: var(--accent); }
+  .stack { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+  .stack span { font-family: var(--mono); font-size: 11px; border: 1px solid var(--line); background: var(--surface); padding: 6px 10px; border-radius: var(--r); color: var(--ink-2); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="frame">
+
+  <div class="intro">
+    <div class="eyebrow">Design proposal / cohort operations</div>
+    <h1>Cohort Dashboard</h1>
+    <p>A marking and follow-up tool for the 24 week programme. It does not host content, the PDFs do that. It answers four questions: where is everyone, what is waiting for me to mark, how do I mark it consistently, and who is about to disappear. Supabase Postgres behind it, ten tables, four screens.</p>
+  </div>
+
+  <div class="app">
+
+    <div class="topbar">
+      <div class="logo"><span class="sq">24</span> Cohort</div>
+      <div class="cohort-pick">Cohort <b>Lagos 01</b> <span style="color:var(--faint)">/</span> Week <b>07</b> of 24</div>
+      <div class="spacer"></div>
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" aria-selected="true" data-view="overview">Overview</button>
+        <button class="tab" role="tab" aria-selected="false" data-view="marking">Marking sheet</button>
+        <button class="tab" role="tab" aria-selected="false" data-view="student">Student</button>
+      </div>
+      <div class="who"><span class="av">II</span> Israel</div>
+    </div>
+
+    <!-- ============ OVERVIEW ============ -->
+    <div class="view on" id="overview">
+
+      <div class="kpis">
+        <div class="kpi">
+          <span class="l">On track</span>
+          <div class="v good">9<span style="color:var(--faint);font-size:1rem">/12</span></div>
+          <div class="d">3 behind by a week or more</div>
+        </div>
+        <div class="kpi">
+          <span class="l">Awaiting marking</span>
+          <div class="v">5</div>
+          <div class="d">oldest waiting 3 days</div>
+        </div>
+        <div class="kpi">
+          <span class="l">Week 7 submitted</span>
+          <div class="v">8<span style="color:var(--faint);font-size:1rem">/12</span></div>
+          <div class="d">due Sunday 23:00</div>
+        </div>
+        <div class="kpi">
+          <span class="l">Cohort average</span>
+          <div class="v">14.2<span style="color:var(--faint);font-size:1rem">/20</span></div>
+          <svg class="spark" width="112" height="26" viewBox="0 0 112 26" aria-label="Cohort average over weeks 1 to 6, rising then dipping at week 6">
+            <polyline points="2,19 20,16 38,12 56,10 74,7 92,13" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/>
+            <circle cx="92" cy="13" r="2.6" fill="var(--accent)"/>
+          </svg>
+        </div>
+        <div class="kpi">
+          <span class="l">Silent 5+ days</span>
+          <div class="v alert">2</div>
+          <div class="d">Chidi O., Tolu A.</div>
+        </div>
+      </div>
+
+      <div class="body">
+        <div class="main">
+          <div class="sect-head">
+            <h2>Progress matrix</h2>
+            <span class="sub">12 students / weeks 1 to 12</span>
+            <div class="chipbar">
+              <span class="chip"><i style="background:var(--ok)"></i>Graded</span>
+              <span class="chip"><i style="background:var(--wait)"></i>Awaiting</span>
+              <span class="chip"><i style="background:var(--warn)"></i>Late</span>
+              <span class="chip"><i style="background:var(--bad)"></i>Missing</span>
+              <span class="chip"><i style="background:var(--idle-bg);border:1px solid var(--line)"></i>Not due</span>
+            </div>
+          </div>
+          <div class="matrixwrap">
+            <table class="matrix" id="matrix">
+              <thead><tr id="mhead"><th class="name">Student</th></tr></thead>
+              <tbody id="mbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="side">
+          <div class="panel">
+            <div class="ph"><h3>Waiting on me</h3><span class="count">5</span></div>
+            <ul class="queue">
+              <li><span class="av">AO</span><div><div class="t">Amaka Okafor</div><div class="m"><span>Week 07</span><span>3d waiting</span></div></div><button class="btn primary">Mark</button></li>
+              <li><span class="av">BE</span><div><div class="t">Bode Eze</div><div class="m"><span>Week 07</span><span class="late">late 1d</span></div></div><button class="btn">Mark</button></li>
+              <li><span class="av">FA</span><div><div class="t">Funmi Adeyemi</div><div class="m"><span>Week 07</span><span>1d waiting</span></div></div><button class="btn">Mark</button></li>
+              <li><span class="av">KN</span><div><div class="t">Kelechi Nwosu</div><div class="m"><span>Week 06</span><span>resubmission</span></div></div><button class="btn">Mark</button></li>
+              <li><span class="av">SI</span><div><div class="t">Seyi Ibrahim</div><div class="m"><span>Week 07</span><span>1d waiting</span></div></div><button class="btn">Mark</button></li>
+            </ul>
+          </div>
+
+          <div class="panel">
+            <div class="ph"><h3>Needs a conversation</h3><span class="count bad">3</span></div>
+            <div class="risk-item">
+              <div class="risk-row"><span class="sev" style="background:var(--bad)"></span><div style="flex:1">
+                <div class="rt">Chidi Obi <span class="tag risk">SILENT</span></div>
+                <p>No commits in 6 days. Week 6 missing, week 7 not started. Last message 8 days ago.</p>
+              </div></div>
+            </div>
+            <div class="risk-item">
+              <div class="risk-row"><span class="sev" style="background:var(--warn)"></span><div style="flex:1">
+                <div class="rt">Tolu Ajayi <span class="tag quiet">DECLINING</span></div>
+                <p>Scores down three weeks running: 16, 13, 10. Explain-back weakest dimension. Submitting, but not understanding.</p>
+              </div></div>
+            </div>
+            <div class="risk-item">
+              <div class="risk-row"><span class="sev" style="background:var(--warn)"></span><div style="flex:1">
+                <div class="rt">Bode Eze <span class="tag quiet">LATE x3</span></div>
+                <p>Third late submission in a row. Quality is fine when it lands. Likely a time problem, not a skill problem.</p>
+              </div></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="ph"><h3>This week</h3><span class="count">W07</span></div>
+            <div style="padding:13px 16px">
+              <div style="font-size:12.5px;font-weight:600;margin-bottom:4px">Building Real APIs with ASP.NET Core</div>
+              <div class="m" style="font-family:var(--mono);font-size:10.5px;color:var(--mute);display:flex;gap:10px;flex-wrap:wrap">
+                <span>Yellow licence</span><span>due Sun 23:00</span><span>9 criteria</span>
+              </div>
+              <div class="links" style="margin-top:12px">
+                <a class="link" href="#">Open brief PDF</a>
+                <a class="link" href="#">Criteria</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ MARKING ============ -->
+    <div class="view" id="marking">
+      <div class="mark-grid">
+        <div class="mark-main">
+          <div class="sub-head">
+            <div class="who-line">
+              <span class="av">AO</span>
+              <div>
+                <h2>Amaka Okafor</h2>
+                <div class="meta">Week 07 / Building Real APIs / submitted Sun 21:14, 3 days waiting</div>
+              </div>
+            </div>
+            <div class="links">
+              <a class="link" href="#">github.com/amaka/week07-api</a>
+              <a class="link" href="#">ai-log.md</a>
+              <a class="link" href="#">Swagger, deployed</a>
+              <a class="link" href="#">PR #4</a>
+            </div>
+          </div>
+
+          <div class="crit">
+            <h3>Acceptance criteria</h3>
+            <p class="hint">Straight from the week 7 brief. Two failed, both worth a conversation rather than a fail.</p>
+            <ul>
+              <li><span class="box met">✓</span><span>Todo API written with no AI generated code</span></li>
+              <li><span class="box met">✓</span><span><code>POST</code> returns 201 and a <code>Location</code> header</span></li>
+              <li><span class="box met">✓</span><span><code>DELETE</code> returns 204 with an empty body</span></li>
+              <li class="failed"><span class="box no">✕</span><span>Missing id returns 404 with a <code>ProblemDetails</code> body</span><span class="note">returns HTML</span></li>
+              <li><span class="box met">✓</span><span>Invalid body returns 400 listing the specific fields</span></li>
+              <li><span class="box met">✓</span><span>Enrolling into a full course returns 409</span></li>
+              <li class="failed"><span class="box no">✕</span><span>No EF entity appears in any API response</span><span class="note">Course leaks</span></li>
+              <li><span class="box met">✓</span><span>Swagger documents and executes every endpoint</span></li>
+              <li><span class="box met">✓</span><span>Frontend has zero <code>fetch</code> calls outside <code>lib/api/</code></span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="rubric">
+          <h3>Rubric, same four every week</h3>
+
+          <div class="dim">
+            <div class="dl"><span class="dn">Build</span><span class="dv">4/5</span></div>
+            <div class="pips"><span class="pip on"></span><span class="pip on"></span><span class="pip on"></span><span class="pip on"></span><span class="pip"></span></div>
+            <div class="dd" style="margin-top:5px">7 of 9 criteria met, clean structure</div>
+          </div>
+
+          <div class="dim">
+            <div class="dl"><span class="dn">Explain-back</span><span class="dv">5/5</span></div>
+            <div class="pips"><span class="pip on"></span><span class="pip on"></span><span class="pip on"></span><span class="pip on"></span><span class="pip on"></span></div>
+            <div class="dd" style="margin-top:5px">Defended every status code choice unprompted</div>
+          </div>
+
+          <div class="dim">
+            <div class="dl"><span class="dn">Tests</span><span class="dv">3/5</span></div>
+            <div class="pips"><span class="pip on low"></span><span class="pip on low"></span><span class="pip on low"></span><span class="pip"></span><span class="pip"></span></div>
+            <div class="dd" style="margin-top:5px">Happy paths only, no failure path coverage</div>
+          </div>
+
+          <div class="dim">
+            <div class="dl"><span class="dn">Review given</span><span class="dv">4/5</span></div>
+            <div class="pips"><span class="pip on"></span><span class="pip on"></span><span class="pip on"></span><span class="pip on"></span><span class="pip"></span></div>
+            <div class="dd" style="margin-top:5px">Found a real 404 bug in Seyi's PR</div>
+          </div>
+
+          <div class="total"><span class="tl">Total</span><span class="tv">16<span style="color:var(--faint);font-size:.95rem">/20</span></span></div>
+
+          <div class="verdict">
+            <button class="vopt pass" aria-pressed="true">Pass</button>
+            <button class="vopt resub" aria-pressed="false">Resubmit</button>
+            <button class="vopt" aria-pressed="false">Fail</button>
+          </div>
+
+          <textarea class="fb" aria-label="Feedback to student">Strong week. Your HTTP reasoning is genuinely good and the explain-back was the best in the cohort.
+
+Two things: your 404 path falls through to the default HTML error page, so add the ProblemDetails middleware and re-test it. And Course is going out on the wire as the EF entity, which is the exact thing DTOs exist to prevent.
+
+Tests: every one of yours passes on a working app. Write three that only pass because the failure handling is right.</textarea>
+
+          <div class="actions" style="margin-top:12px">
+            <button class="btn primary">Save and next</button>
+            <button class="btn">Save draft</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ STUDENT ============ -->
+    <div class="view" id="student">
+      <div class="sd-head">
+        <span class="av lg">TA</span>
+        <div>
+          <h2>Tolu Ajayi</h2>
+          <div class="meta">Cohort Lagos 01 / joined 6 Jan / flagged declining</div>
+        </div>
+        <div class="sd-stats">
+          <div><div class="v">13.2</div><div class="l">avg / 20</div></div>
+          <div><div class="v">6/7</div><div class="l">submitted</div></div>
+          <div><div class="v" style="color:var(--warn)">3</div><div class="l">weeks falling</div></div>
+        </div>
+      </div>
+
+      <div class="trend">
+        <h3>Score by week</h3>
+        <p class="sub">The build score is holding. Explain-back is what is falling, which is the signal that matters.</p>
+        <svg width="100%" height="140" viewBox="0 0 620 140" preserveAspectRatio="none" role="img" aria-label="Build score stays near 4 while explain-back falls from 4 to 1.5 over seven weeks">
+          <line x1="0" y1="20" x2="620" y2="20" stroke="var(--line-2)" stroke-width="1"/>
+          <line x1="0" y1="60" x2="620" y2="60" stroke="var(--line-2)" stroke-width="1"/>
+          <line x1="0" y1="100" x2="620" y2="100" stroke="var(--line-2)" stroke-width="1"/>
+          <polyline points="20,44 120,36 220,40 320,36 420,44 520,40 600,48" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round"/>
+          <polyline points="20,40 120,44 220,52 320,68 420,88 520,104 600,116" fill="none" stroke="var(--warn)" stroke-width="2.2" stroke-linejoin="round"/>
+          <circle cx="600" cy="116" r="4" fill="var(--warn)"/>
+          <circle cx="600" cy="48" r="4" fill="var(--accent)"/>
+        </svg>
+        <div style="display:flex;gap:18px;margin-top:8px;font-family:var(--mono);font-size:10.5px;color:var(--mute)">
+          <span><i style="display:inline-block;width:14px;height:2.5px;background:var(--accent);vertical-align:3px;margin-right:6px"></i>Build</span>
+          <span><i style="display:inline-block;width:14px;height:2.5px;background:var(--warn);vertical-align:3px;margin-right:6px"></i>Explain-back</span>
+          <span style="margin-left:auto">weeks 1 to 7</span>
+        </div>
+      </div>
+
+      <ul class="timeline">
+        <li><span class="wk">WEEK 07</span><div><div class="tt">Building Real APIs</div><div class="ts">Submitted Sun 22:51. Awaiting explain-back session.</div></div><span class="pill wait">Awaiting</span></li>
+        <li><span class="wk">WEEK 06</span><div><div class="tt">EF Core and SQL Server</div><div class="ts">10/20. Could not explain the N+1 fix in their own repo.</div></div><span class="pill bad">10 / 20</span></li>
+        <li><span class="wk">WEEK 05</span><div><div class="tt">Architecture and TypeScript</div><div class="ts">13/20. Layering correct, could not say why Domain references nothing.</div></div><span class="pill warn">13 / 20</span></li>
+        <li><span class="wk">WEEK 04</span><div><div class="tt">Generics, LINQ, React state</div><div class="ts">16/20. First week on Yellow licence.</div></div><span class="pill ok">16 / 20</span></li>
+        <li><span class="wk">WEEK 03</span><div><div class="tt">OOP and first React</div><div class="ts">15/20. Strong class model, drawn before coded.</div></div><span class="pill ok">15 / 20</span></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="under">
+    <h2>Under the hood</h2>
+    <p>Ten tables in Supabase Postgres, with row level security doing the authorisation so there is no custom API layer to maintain. One view, <span style="font-family:var(--mono);font-size:12px">v_student_progress</span>, powers the matrix, the KPIs and the flags. Students are learning this exact stack in weeks 5 to 8, so the tool doubles as a reference implementation.</p>
+    <div class="tables">
+      <div class="tbl"><div class="tn">cohorts</div><ul><li><span class="k">id</span></li><li>name</li><li>starts_on</li><li>active</li></ul></div>
+      <div class="tbl"><div class="tn">profiles</div><ul><li><span class="k">id</span> = auth.users</li><li>full_name</li><li>email</li><li>role</li></ul></div>
+      <div class="tbl"><div class="tn">enrolments</div><ul><li><span class="k">id</span></li><li><span class="f">cohort_id</span></li><li><span class="f">student_id</span></li><li>status</li></ul></div>
+      <div class="tbl"><div class="tn">weeks</div><ul><li><span class="k">id</span></li><li>week_no 0 to 24</li><li>title, phase</li><li>ai_licence</li><li>pdf_path</li></ul></div>
+      <div class="tbl"><div class="tn">cohort_weeks</div><ul><li><span class="k">id</span></li><li><span class="f">cohort_id</span></li><li><span class="f">week_id</span></li><li>opens_on, due_on</li></ul></div>
+      <div class="tbl"><div class="tn">criteria</div><ul><li><span class="k">id</span></li><li><span class="f">week_id</span></li><li>position</li><li>text</li></ul></div>
+      <div class="tbl"><div class="tn">submissions</div><ul><li><span class="k">id</span></li><li><span class="f">cohort_week_id</span></li><li><span class="f">student_id</span></li><li>repo_url, ai_log_url</li><li>status, submitted_at</li></ul></div>
+      <div class="tbl"><div class="tn">criteria_checks</div><ul><li><span class="k">id</span></li><li><span class="f">submission_id</span></li><li><span class="f">criterion_id</span></li><li>met, comment</li></ul></div>
+      <div class="tbl"><div class="tn">marks</div><ul><li><span class="k">id</span></li><li><span class="f">submission_id</span></li><li>build, explain_back</li><li>tests, review_given</li><li>verdict, feedback</li></ul></div>
+      <div class="tbl"><div class="tn">peer_reviews</div><ul><li><span class="k">id</span></li><li><span class="f">submission_id</span></li><li><span class="f">reviewer_id</span></li><li>findings, quality</li></ul></div>
+      <div class="tbl"><div class="tn">flags</div><ul><li><span class="k">id</span></li><li><span class="f">student_id</span></li><li>kind, note</li><li>opened_at, closed_at</li></ul></div>
+    </div>
+    <div class="stack">
+      <span>Supabase Postgres</span><span>Supabase Auth + RLS</span><span>Supabase Storage for briefs</span>
+      <span>Next.js 15 App Router</span><span>TypeScript</span><span>Tailwind</span><span>Vercel</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Progress matrix data: 12 students x 12 weeks
+  const STUDENTS = [
+    ['Amaka Okafor','AO',null,[3,3,3,3,3,3,1,0,0,0,0,0],'16.4'],
+    ['Funmi Adeyemi','FA',null,[3,3,3,3,3,3,1,0,0,0,0,0],'17.1'],
+    ['Seyi Ibrahim','SI',null,[3,3,3,3,3,3,1,0,0,0,0,0],'15.6'],
+    ['Ngozi Uche','NU',null,[3,3,3,3,3,3,3,0,0,0,0,0],'18.2'],
+    ['Emeka Duru','ED',null,[3,3,3,3,3,3,3,0,0,0,0,0],'15.0'],
+    ['Aisha Bello','AB',null,[3,3,3,3,3,3,3,0,0,0,0,0],'16.8'],
+    ['Kelechi Nwosu','KN',null,[3,3,3,2,3,4,1,0,0,0,0,0],'12.9'],
+    ['Bode Eze','BE','quiet',[3,3,2,3,2,2,2,0,0,0,0,0],'13.4'],
+    ['Yemi Sanusi','YS',null,[3,3,3,3,3,3,3,0,0,0,0,0],'14.7'],
+    ['Tolu Ajayi','TA','quiet',[3,3,3,3,4,5,1,0,0,0,0,0],'13.2'],
+    ['Chidi Obi','CO','risk',[3,3,3,4,5,5,5,0,0,0,0,0],'9.8'],
+    ['Zainab Musa','ZM',null,[3,3,3,3,3,3,3,0,0,0,0,0],'16.0']
+  ];
+  const CLS = { 0:'future', 1:'submitted', 2:'late', 3:'graded', 4:'gradedlow', 5:'missing' };
+  const LBL = { 0:'not due', 1:'awaiting marking', 2:'late', 3:'graded', 4:'graded, low', 5:'missing' };
+
+  const head = document.getElementById('mhead');
+  for (let w = 1; w <= 12; w++) {
+    const th = document.createElement('th');
+    th.textContent = String(w).padStart(2, '0');
+    head.appendChild(th);
+  }
+  const thAvg = document.createElement('th');
+  thAvg.textContent = 'AVG';
+  thAvg.style.textAlign = 'right';
+  thAvg.style.paddingRight = '18px';
+  head.appendChild(thAvg);
+
+  const tb = document.getElementById('mbody');
+  STUDENTS.forEach(([name, initials, tag, cells, avg]) => {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.className = 'name';
+    td.innerHTML = '<div class="row"><span class="av">' + initials + '</span><span class="nm">' + name + '</span>' +
+      (tag ? '<span class="tag ' + tag + '">' + (tag === 'risk' ? 'AT RISK' : 'WATCH') + '</span>' : '') + '</div>';
+    tr.appendChild(td);
+    cells.forEach((c, i) => {
+      const cw = document.createElement('td');
+      cw.className = 'cellw';
+      cw.innerHTML = '<span class="cell ' + CLS[c] + '"></span>';
+      cw.title = name + ', week ' + String(i + 1).padStart(2, '0') + ': ' + LBL[c];
+      tr.appendChild(cw);
+    });
+    const sc = document.createElement('td');
+    sc.className = 'score';
+    sc.innerHTML = avg + '<span class="pct"> /20</span>';
+    tr.appendChild(sc);
+    tb.appendChild(tr);
+  });
+
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', String(x === t)));
+      document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.id === t.dataset.view));
+    });
+  });
+
+  document.querySelectorAll('.vopt').forEach(v => {
+    v.addEventListener('click', () => {
+      document.querySelectorAll('.vopt').forEach(x => x.setAttribute('aria-pressed', String(x === v)));
+    });
+  });
+</script>

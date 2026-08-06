@@ -1,0 +1,8 @@
+# Generated output. Everything in dist/ is rebuilt from content/ and build/ by
+# `python3 build/build_pdfs.py`, so the source is what needs versioning, not the artefacts.
+dist/
+
+# Local scratch
+.DS_Store
+__pycache__/
+*.pyc

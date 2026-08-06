@@ -1,0 +1,576 @@
+<title>Zero to Full Stack: The 24 Week Journey</title>
+
+<style>
+  :root {
+    --ink: #0E1116;
+    --ink-2: #333B47;
+    --mute: #67707E;
+    --line: #DDE1E8;
+    --paper: #F7F8FA;
+    --paper-2: #FFFFFF;
+    --band: #EEF1F6;
+    --accent: #2F6FED;
+    --accent-soft: #E4EBFC;
+    --accent-deep: #1B47A8;
+    --warm: #D4501E;
+    --warm-soft: #FBE9E1;
+    --lic-red: #C63A3A;
+    --lic-amber: #C08A00;
+    --lic-green: #21804B;
+    --shadow: 0 1px 2px rgba(14,17,22,.06), 0 8px 30px rgba(14,17,22,.06);
+
+    --display: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #EDF0F5; --ink-2: #B6BECB; --mute: #7B8493; --line: #262C36;
+      --paper: #0B0E13; --paper-2: #12161D; --band: #161B23;
+      --accent: #6E9BFF; --accent-soft: #16233D; --accent-deep: #9BB9FF;
+      --warm: #FF8355; --warm-soft: #2E1A12;
+      --lic-red: #E86464; --lic-amber: #E0AC2B; --lic-green: #46B87A;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 34px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #EDF0F5; --ink-2: #B6BECB; --mute: #7B8493; --line: #262C36;
+    --paper: #0B0E13; --paper-2: #12161D; --band: #161B23;
+    --accent: #6E9BFF; --accent-soft: #16233D; --accent-deep: #9BB9FF;
+    --warm: #FF8355; --warm-soft: #2E1A12;
+    --lic-red: #E86464; --lic-amber: #E0AC2B; --lic-green: #46B87A;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 34px rgba(0,0,0,.35);
+  }
+  :root[data-theme="light"] {
+    --ink: #0E1116; --ink-2: #333B47; --mute: #67707E; --line: #DDE1E8;
+    --paper: #F7F8FA; --paper-2: #FFFFFF; --band: #EEF1F6;
+    --accent: #2F6FED; --accent-soft: #E4EBFC; --accent-deep: #1B47A8;
+    --warm: #D4501E; --warm-soft: #FBE9E1;
+    --lic-red: #C63A3A; --lic-amber: #C08A00; --lic-green: #21804B;
+    --shadow: 0 1px 2px rgba(14,17,22,.06), 0 8px 30px rgba(14,17,22,.06);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--display);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- rail ---------- */
+
+  .rail {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 62px;
+    border-right: 1px solid var(--line);
+    background: var(--paper-2);
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 18px 0;
+    gap: 3px;
+    z-index: 20;
+  }
+  .rail .mark {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: .06em;
+    color: var(--mute);
+    margin-bottom: 10px;
+  }
+  .tick {
+    width: 22px; height: 5px;
+    border-radius: 1px;
+    background: var(--line);
+    transition: background .35s ease, width .35s ease;
+  }
+  .tick.on { background: var(--accent); width: 30px; }
+  .tick.warm.on { background: var(--warm); }
+  .rail .now {
+    margin-top: 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- slides ---------- */
+
+  main {
+    margin-left: 62px;
+    scroll-snap-type: y mandatory;
+    height: 100vh;
+    overflow-y: scroll;
+  }
+  section {
+    scroll-snap-align: start;
+    min-height: 100vh;
+    padding: 7vh 6vw 8vh;
+    display: flex; flex-direction: column; justify-content: center;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 22px;
+    display: flex; gap: 14px; align-items: center;
+  }
+  .eyebrow::after {
+    content: ""; flex: 1; height: 1px; background: var(--line); max-width: 180px;
+  }
+  .eyebrow.warm { color: var(--warm); }
+
+  h1 {
+    font-size: clamp(2.6rem, 6.4vw, 5.4rem);
+    line-height: .96;
+    letter-spacing: -.035em;
+    font-weight: 700;
+    margin: 0 0 26px;
+    text-wrap: balance;
+    max-width: 16ch;
+  }
+  h2 {
+    font-size: clamp(1.8rem, 3.6vw, 3.1rem);
+    line-height: 1.04;
+    letter-spacing: -.028em;
+    font-weight: 700;
+    margin: 0 0 28px;
+    text-wrap: balance;
+    max-width: 20ch;
+  }
+  h3 {
+    font-size: 1.02rem; font-weight: 700; margin: 0 0 8px; letter-spacing: -.01em;
+  }
+  p { margin: 0 0 16px; line-height: 1.55; color: var(--ink-2); max-width: 62ch; font-size: 1.02rem; }
+  .lead { font-size: clamp(1.05rem, 1.7vw, 1.34rem); color: var(--ink-2); max-width: 54ch; line-height: 1.48; }
+  strong { color: var(--ink); font-weight: 700; }
+
+  .kicker {
+    font-family: var(--mono); font-size: 12px; color: var(--mute);
+    letter-spacing: .04em; margin-top: 30px;
+  }
+
+  /* ---------- cover ---------- */
+
+  .cover-meta {
+    display: flex; flex-wrap: wrap; gap: 0;
+    border-top: 1px solid var(--line);
+    margin-top: 46px;
+  }
+  .cover-meta div {
+    padding: 18px 34px 0 0; margin-right: 34px;
+    border-right: 1px solid var(--line);
+  }
+  .cover-meta div:last-child { border-right: 0; }
+  .cover-meta .n {
+    font-family: var(--mono); font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 700;
+    letter-spacing: -.03em; display: block; color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .cover-meta .l {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--mute); margin-top: 5px; display: block;
+  }
+
+  /* ---------- generic grid ---------- */
+
+  .cols { display: grid; gap: 26px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); margin-top: 8px; }
+  .card {
+    background: var(--paper-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 22px 22px 24px;
+  }
+  .card p { font-size: .93rem; margin-bottom: 0; }
+  .card .num {
+    font-family: var(--mono); font-size: 11px; color: var(--accent);
+    letter-spacing: .1em; display: block; margin-bottom: 12px; font-weight: 600;
+  }
+
+  /* ---------- two rails ---------- */
+
+  .rails { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0; align-items: stretch; margin-top: 10px; }
+  .track { padding: 24px 30px; background: var(--paper-2); border: 1px solid var(--line); }
+  .track:first-child { border-radius: 4px 0 0 4px; border-right: 0; }
+  .track:last-child { border-radius: 0 4px 4px 0; border-left: 0; }
+  .track h3 { font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--mute); margin-bottom: 16px; }
+  .track ul { margin: 0; padding-left: 17px; }
+  .track li { margin-bottom: 9px; line-height: 1.4; color: var(--ink-2); font-size: .95rem; }
+  .track li::marker { color: var(--accent); }
+  .seam {
+    width: 1px; background: var(--line); position: relative;
+  }
+  .seam span {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    background: var(--accent); color: #fff; font-family: var(--mono);
+    font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+    padding: 7px 10px; border-radius: 3px; white-space: nowrap; font-weight: 600;
+  }
+  @media (max-width: 760px) {
+    .rails { grid-template-columns: 1fr; }
+    .track, .track:first-child, .track:last-child { border: 1px solid var(--line); border-radius: 4px; }
+    .seam { width: auto; height: 44px; background: none; }
+  }
+
+  /* ---------- licence ---------- */
+
+  .lic { display: grid; gap: 0; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+  .lic > div { padding: 26px 24px 28px; border-right: 1px solid var(--line); background: var(--paper-2); }
+  .lic > div:last-child { border-right: 0; }
+  .lic .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; margin-right: 9px; vertical-align: -1px; }
+  .lic .t { font-size: 1.15rem; font-weight: 700; margin-bottom: 4px; letter-spacing: -.015em; }
+  .lic .w { font-family: var(--mono); font-size: 11px; color: var(--mute); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 16px; }
+  .lic p { font-size: .92rem; margin-bottom: 12px; }
+  .lic .check { font-size: .87rem; color: var(--ink); border-top: 1px solid var(--line); padding-top: 12px; margin-top: 4px; }
+  .r .dot { background: var(--lic-red); } .r .t { color: var(--lic-red); }
+  .y .dot { background: var(--lic-amber); } .y .t { color: var(--lic-amber); }
+  .g .dot { background: var(--lic-green); } .g .t { color: var(--lic-green); }
+  @media (max-width: 820px) { .lic > div { border-right: 0; border-bottom: 1px solid var(--line); } }
+
+  /* ---------- phase slide ---------- */
+
+  .phase-head { display: flex; align-items: baseline; gap: 20px; flex-wrap: wrap; margin-bottom: 6px; }
+  .phase-num {
+    font-family: var(--mono); font-size: clamp(3.4rem, 9vw, 7rem); font-weight: 700;
+    line-height: .8; letter-spacing: -.05em; color: var(--accent-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .phase-weeks { font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
+  .beats { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; margin-top: 26px; }
+  .beat { background: var(--paper-2); padding: 15px 20px; display: grid; grid-template-columns: 74px 1fr; gap: 20px; align-items: baseline; }
+  .beat .wk { font-family: var(--mono); font-size: 11px; color: var(--accent); font-weight: 700; letter-spacing: .06em; }
+  .beat .txt { font-size: .95rem; color: var(--ink-2); line-height: 1.4; }
+  .beat .txt b { color: var(--ink); }
+  .ship {
+    margin-top: 24px; padding: 16px 20px; border-left: 3px solid var(--warm);
+    background: var(--warm-soft); border-radius: 0 4px 4px 0;
+  }
+  .ship .l { font-family: var(--mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--warm); font-weight: 700; }
+  .ship p { margin: 6px 0 0; font-size: .95rem; color: var(--ink); }
+
+  /* ---------- map ---------- */
+
+  .mapwrap { overflow-x: auto; padding-bottom: 10px; margin-top: 10px; }
+  .map { display: grid; grid-template-columns: repeat(24, minmax(46px, 1fr)); gap: 3px; min-width: 900px; }
+  .cell {
+    background: var(--band); border-radius: 2px; padding: 9px 6px 12px;
+    border-top: 3px solid var(--accent); min-height: 120px;
+  }
+  .cell.p2 { border-top-color: color-mix(in srgb, var(--accent) 78%, var(--warm)); }
+  .cell.p3 { border-top-color: color-mix(in srgb, var(--accent) 56%, var(--warm)); }
+  .cell.p4 { border-top-color: color-mix(in srgb, var(--accent) 34%, var(--warm)); }
+  .cell.p5 { border-top-color: color-mix(in srgb, var(--accent) 16%, var(--warm)); }
+  .cell.p6 { border-top-color: var(--warm); }
+  .cell .w { font-family: var(--mono); font-size: 10px; color: var(--mute); font-weight: 700; display: block; margin-bottom: 6px; font-variant-numeric: tabular-nums; }
+  .cell .t { font-size: 11px; line-height: 1.25; color: var(--ink); }
+  .legend { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 22px; font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+  .legend i { width: 16px; height: 3px; display: inline-block; margin-right: 7px; vertical-align: 3px; }
+
+  /* ---------- assessment list ---------- */
+
+  .numbered { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; margin-top: 6px; }
+  .numbered > div { background: var(--paper-2); padding: 20px 24px; display: grid; grid-template-columns: 46px 1fr; gap: 18px; }
+  .numbered .n { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--accent); padding-top: 3px; }
+  .numbered p { margin: 6px 0 0; font-size: .93rem; }
+
+  .final { border-top: 1px solid var(--line); margin-top: 34px; padding-top: 26px; }
+  .final ul { columns: 2; column-gap: 46px; margin: 0; padding-left: 18px; }
+  .final li { margin-bottom: 11px; color: var(--ink-2); line-height: 1.4; break-inside: avoid; }
+  .final li::marker { color: var(--warm); }
+  @media (max-width: 700px) { .final ul { columns: 1; } }
+
+  .hint {
+    position: fixed; right: 20px; bottom: 18px; z-index: 30;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--mute);
+    background: var(--paper-2); border: 1px solid var(--line);
+    padding: 7px 11px; border-radius: 3px;
+    transition: opacity .5s ease;
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+
+<nav class="rail" aria-label="Programme progress">
+  <span class="mark">WK</span>
+  <div id="ticks"></div>
+  <span class="now" id="now">00</span>
+</nav>
+
+<main id="deck">
+
+  <section>
+    <div class="eyebrow">Six months / Twenty four weeks</div>
+    <h1>Zero to full stack engineer.</h1>
+    <p class="lead">A .NET and React programme that assumes you have never written a line of code, and ends with you designing systems on a whiteboard and defending a product you built, deployed and monitored yourself.</p>
+    <div class="cover-meta">
+      <div><span class="n">24</span><span class="l">weeks</span></div>
+      <div><span class="n">2</span><span class="l">projects</span></div>
+      <div><span class="n">28h</span><span class="l">per week</span></div>
+      <div><span class="n">3</span><span class="l">AI licence tiers</span></div>
+    </div>
+    <div class="kicker">Scroll, or press the arrow keys</div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Why this is not the old curriculum</div>
+    <h2>AI changed what a junior is worth.</h2>
+    <p class="lead">The same six months, redesigned around three things that are now true and were not true three years ago.</p>
+    <div class="cols">
+      <div class="card">
+        <span class="num">SHIFT 01</span>
+        <h3>Writing got cheap. Verifying did not.</h3>
+        <p>Producing a repository pattern from memory is no longer a scarce skill. Looking at 200 generated lines and knowing they are wrong is. Reading, debugging and review move to week two, not week twenty.</p>
+      </div>
+      <div class="card">
+        <span class="num">SHIFT 02</span>
+        <h3>Fundamentals matter more, not less.</h3>
+        <p>AI collapses the time to a working app. It does not collapse the time to a working mental model. The gap between someone who understands what their code does and someone who does not is now the whole difference in value.</p>
+      </div>
+      <div class="card">
+        <span class="num">SHIFT 03</span>
+        <h3>The failure mode is new.</h3>
+        <p>The old risk was quitting after three days stuck. The new risk is shipping six impressive projects, explaining none of them, and failing the first interview. Every assessment here is built to catch that.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">The structure</div>
+    <h2>Two tracks. One project. Every week.</h2>
+    <p class="lead">The frontend never runs as a separate course. Each week the React side consumes exactly what the C# side produced, so the two halves teach each other.</p>
+    <div class="rails">
+      <div class="track">
+        <h3>Backend track</h3>
+        <ul>
+          <li>C# fundamentals, then the debugger before anything else</li>
+          <li>Collections, files, object orientation, generics, LINQ</li>
+          <li>Layered architecture, EF Core, SQL Server</li>
+          <li>ASP.NET Core Web APIs, clean architecture, testing</li>
+          <li>Auth, caching, queues, payments, real time</li>
+          <li>Performance, distributed systems, security, operations</li>
+        </ul>
+      </div>
+      <div class="seam"><span>same project</span></div>
+      <div class="track">
+        <h3>Frontend track</h3>
+        <ul>
+          <li>HTML, CSS and the DOM by hand, no framework</li>
+          <li>Modern JavaScript and the event loop, drawn on paper</li>
+          <li>React components, state, forms, then TypeScript</li>
+          <li>Next.js App Router, server components, TanStack Query</li>
+          <li>Design systems, streaming UI, upload and checkout flows</li>
+          <li>Core Web Vitals, accessibility, error tracking</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">The rule that governs everything</div>
+    <h2>The AI licence.</h2>
+    <p class="lead">How much a student may delegate changes as they grow. The tier is stated on every weekly brief and enforced in review.</p>
+    <div class="lic">
+      <div class="r">
+        <div class="w"><span class="dot"></span>Weeks 1 to 4</div>
+        <div class="t">Red</div>
+        <p><strong>AI is a tutor, never a typist.</strong> Explanations, quizzes, practice sets and review of code the student already wrote. Tab completion off.</p>
+        <p class="check">Check: can you retype the file from an empty editor?</p>
+      </div>
+      <div class="y">
+        <div class="w"><span class="dot"></span>Weeks 5 to 12</div>
+        <div class="t">Yellow</div>
+        <p><strong>AI writes boilerplate. You write the thinking.</strong> Scaffolding, config, test skeletons, three-approaches-and-tradeoffs questions.</p>
+        <p class="check">Check: a random line is picked in review. One "I don't know" returns the work.</p>
+      </div>
+      <div class="g">
+        <div class="w"><span class="dot"></span>Weeks 13 to 24</div>
+        <div class="t">Green</div>
+        <p><strong>AI implements. You review.</strong> Written spec before generation, line by line review after, full ownership of the result. This is the actual job.</p>
+        <p class="check">Check: "the AI wrote it" is not an explanation, here or in a post-mortem.</p>
+      </div>
+    </div>
+    <p class="kicker">Every student submits an ai-log.md each week: what was delegated, what came back, what they changed and why. It is assessed.</p>
+  </section>
+
+  <section>
+    <div class="phase-head"><span class="phase-num">01</span><div><div class="eyebrow">Phase one</div><h2 style="margin:0">Fundamentals</h2></div><span class="phase-weeks">Weeks 1 to 4 / Red licence</span></div>
+    <div class="beats">
+      <div class="beat"><span class="wk">WEEK 01</span><span class="txt"><b>Variables, logic and the debugger.</b> Breakpoints in week one, before print statements become a habit. Console calculator, plus a hand-built HTML page.</span></div>
+      <div class="beat"><span class="wk">WEEK 02</span><span class="txt"><b>Collections, files, modern JavaScript.</b> The calculator remembers. The event loop gets drawn on paper.</span></div>
+      <div class="beat"><span class="wk">WEEK 03</span><span class="txt"><b>Object orientation and first React.</b> The school project begins, designed on paper before a class is typed.</span></div>
+      <div class="beat"><span class="wk">WEEK 04</span><span class="txt"><b>Generics, LINQ and React state.</b> One repository serving four types. Twenty LINQ queries written by hand, wrong, repeatedly.</span></div>
+    </div>
+    <div class="ship"><span class="l">By the end</span><p>A school modelled properly in C# with full CRUD, and a React directory with forms, validation and routing.</p></div>
+  </section>
+
+  <section>
+    <div class="phase-head"><span class="phase-num">02</span><div><div class="eyebrow">Phase two</div><h2 style="margin:0">Persistence and APIs</h2></div><span class="phase-weeks">Weeks 5 to 8 / Yellow opens</span></div>
+    <div class="beats">
+      <div class="beat"><span class="wk">WEEK 05</span><span class="txt"><b>Architecture, TypeScript, saving to disk.</b> Four projects, dependencies pointing inward, and the move to Next.js.</span></div>
+      <div class="beat"><span class="wk">WEEK 06</span><span class="txt"><b>EF Core and SQL Server.</b> Thirty SQL queries by hand before the ORM is allowed anywhere near them.</span></div>
+      <div class="beat"><span class="wk">WEEK 07</span><span class="txt"><b>Real APIs.</b> A Todo API written entirely by hand as the HTTP gym, then the school goes over the wire.</span></div>
+      <div class="beat"><span class="wk">WEEK 08</span><span class="txt"><b>Clean architecture and first tests.</b> Patterns learned as answers to named problems, plus an architecture test that fails the build.</span></div>
+    </div>
+    <div class="ship"><span class="l">By the end</span><p>A genuine full stack application: layered API, real database, typed Next.js frontend, and a test suite.</p></div>
+  </section>
+
+  <section>
+    <div class="phase-head"><span class="phase-num">03</span><div><div class="eyebrow">Phase three</div><h2 style="margin:0">Production concerns</h2></div><span class="phase-weeks">Weeks 9 to 12 / Yellow</span></div>
+    <div class="beats">
+      <div class="beat"><span class="wk">WEEK 09</span><span class="txt"><b>Integration and end to end testing.</b> Real database in a container, real browser in Playwright.</span></div>
+      <div class="beat"><span class="wk">WEEK 10</span><span class="txt"><b>Authentication and authorization.</b> Day seven is spent attacking their own auth and writing down what worked.</span></div>
+      <div class="beat"><span class="wk">WEEK 11</span><span class="txt"><b>What real APIs have.</b> Logging, caching, rate limits, secrets, health checks, and 50,000 seeded students to break things.</span></div>
+      <div class="beat"><span class="wk">WEEK 12</span><span class="txt"><b>Git, Docker, CI/CD, first deploy.</b> A live URL, a practised rollback, and the capstone proposal.</span></div>
+    </div>
+    <div class="ship"><span class="l">By the end</span><p>The app leaves the laptop. Public URL, green pipeline, one-command local stack, and a runbook.</p></div>
+  </section>
+
+  <section>
+    <div class="phase-head"><span class="phase-num">04</span><div><div class="eyebrow">Phase four</div><h2 style="margin:0">Depth</h2></div><span class="phase-weeks">Weeks 13 to 18 / Green licence</span></div>
+    <div class="beats">
+      <div class="beat"><span class="wk">WEEK 13</span><span class="txt"><b>Frontend craft.</b> Capstone starts. Design tokens, component library, profiling before optimising.</span></div>
+      <div class="beat"><span class="wk">WEEK 14</span><span class="txt"><b>Real time, uploads, and a cold codebase.</b> Two days inside a repository they have never seen, with a ticket.</span></div>
+      <div class="beat"><span class="wk">WEEK 15</span><span class="txt"><b>Background jobs and payments.</b> The duplicate webhook drill. Send it five times and see if the user is charged twice.</span></div>
+      <div class="beat"><span class="wk">WEEK 16</span><span class="txt"><b>Performance at scale.</b> No optimisation without a measurement on both sides of it.</span></div>
+      <div class="beat"><span class="wk">WEEK 17</span><span class="txt"><b>Distributed systems.</b> Extract exactly one service, feel the cost, then argue honestly against it.</span></div>
+      <div class="beat"><span class="wk">WEEK 18</span><span class="txt"><b>Security and code review.</b> Attack their own app, then find planted defects in code that looks fine. No AI.</span></div>
+    </div>
+    <div class="ship"><span class="l">By the end</span><p>A capstone with real-time features, payments, measured performance, and a threat model they wrote themselves.</p></div>
+  </section>
+
+  <section>
+    <div class="phase-head"><span class="phase-num">05</span><div><div class="eyebrow">Phase five</div><h2 style="margin:0">AI engineering, and the sprint</h2></div><span class="phase-weeks">Weeks 19 to 22 / Green</span></div>
+    <div class="beats">
+      <div class="beat"><span class="wk">WEEK 19</span><span class="txt"><b>Building with LLMs.</b> Streaming, structured output, tool use, cost caps, and building the non-AI version first to check the model is needed at all.</span></div>
+      <div class="beat"><span class="wk">WEEK 20</span><span class="txt"><b>Retrieval and evaluation.</b> Anyone can demo RAG. Putting a number on whether it works is the rare skill.</span></div>
+      <div class="beat"><span class="wk">WEEK 21</span><span class="txt"><b>Sprint, run like a team.</b> Standups, groomed backlog, two approvals per PR, Friday demo, retrospective.</span></div>
+      <div class="beat"><span class="wk">WEEK 22</span><span class="txt"><b>Feature freeze and hardening.</b> Forty edge cases, tested and documented. Empty states, double clicks, dead networks, two tabs.</span></div>
+    </div>
+    <div class="ship"><span class="l">By the end</span><p>Feature-complete product with a grounded AI feature, an eval suite in CI, and a hand-written golden dataset.</p></div>
+  </section>
+
+  <section>
+    <div class="phase-head"><span class="phase-num">06</span><div><div class="eyebrow">Phase six</div><h2 style="margin:0">Ship and get hired</h2></div><span class="phase-weeks">Weeks 23 to 24 / AI off for assessment</span></div>
+    <div class="beats">
+      <div class="beat"><span class="wk">WEEK 23</span><span class="txt"><b>Production readiness.</b> Dashboards, alerts to a phone, a real restore drill, zero downtime deploy, and chaos day.</span></div>
+      <div class="beat"><span class="wk">WEEK 24</span><span class="txt"><b>Prove it.</b> System design on a whiteboard, live coding with no AI, and a capstone defence where the architecture is questioned hard.</span></div>
+    </div>
+    <div class="ship"><span class="l">The final gate</span><p>Three assessments, all with AI switched off, because what remains when the tools are removed is the honest measure of six months.</p></div>
+  </section>
+
+  <section>
+    <div class="eyebrow">The whole thing, one view</div>
+    <h2>Twenty four weeks.</h2>
+    <div class="mapwrap">
+      <div class="map" id="map"></div>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--accent)"></i>Fundamentals</span>
+      <span><i style="background:color-mix(in srgb, var(--accent) 78%, var(--warm))"></i>Persistence and APIs</span>
+      <span><i style="background:color-mix(in srgb, var(--accent) 56%, var(--warm))"></i>Production</span>
+      <span><i style="background:color-mix(in srgb, var(--accent) 34%, var(--warm))"></i>Depth</span>
+      <span><i style="background:color-mix(in srgb, var(--accent) 16%, var(--warm))"></i>AI and sprint</span>
+      <span><i style="background:var(--warm)"></i>Ship</span>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Assessment</div>
+    <h2>Five mechanisms generated code cannot pass.</h2>
+    <div class="numbered">
+      <div><span class="n">01</span><div><h3>The weekly build</h3><p>Backend and frontend, against explicit acceptance criteria printed in that week's brief. Ticked honestly or not at all.</p></div></div>
+      <div><span class="n">02</span><div><h3>Explain it back</h3><p>Live, out loud, editor closed. Nothing counts as done until it survives this. Code that works but cannot be explained scores zero.</p></div></div>
+      <div><span class="n">03</span><div><h3>The blank editor drill</h3><p>Thirty minutes, no AI, no internet. Rebuild something small from that week from nothing.</p></div></div>
+      <div><span class="n">04</span><div><h3>Planted-defect review</h3><p>Code that compiles, passes its tests and hides real bugs, including one that only appears under concurrency. Finding them is the job.</p></div></div>
+      <div><span class="n">05</span><div><h3>The cold codebase</h3><p>Two days in a repository they have never seen, with a ticket. Reading unfamiliar code is what month one of a real job actually is.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow warm">Outcome</div>
+    <h2>What they can do on the last day.</h2>
+    <div class="final">
+      <ul>
+        <li>Design a system for ten million users and name where it breaks first</li>
+        <li>Build and ship a layered .NET API with a real database</li>
+        <li>Build a typed Next.js frontend that is fast and accessible</li>
+        <li>Write tests that fail when the feature is broken</li>
+        <li>Find an access control hole in code that looks fine</li>
+        <li>Take a service down and bring it back, with the runbook they wrote</li>
+        <li>Add an AI feature and prove with numbers that it works</li>
+        <li>Read a codebase they have never seen and ship a change in it</li>
+        <li>Review a pull request and find something real</li>
+        <li>Explain every decision in their own product, without help</li>
+      </ul>
+    </div>
+    <p class="kicker">The tools will keep getting better at writing code. They will not get better at deciding what should be built, judging whether the answer is right, or being accountable when it is wrong. That is the job this programme protects.</p>
+  </section>
+
+</main>
+
+<div class="hint" id="hint">↑ ↓ to navigate</div>
+
+<script>
+  const PHASES = [
+    { n: 4, cls: '',   titles: ['Variables, logic, the debugger','Collections, files, JavaScript','OOP and first React','Generics, LINQ, React state'] },
+    { n: 4, cls: 'p2', titles: ['Architecture and TypeScript','EF Core and SQL Server','ASP.NET Core Web APIs','Clean architecture, first tests'] },
+    { n: 4, cls: 'p3', titles: ['Integration and E2E testing','Auth and authorization','Logging, caching, limits','Docker, CI/CD, first deploy'] },
+    { n: 6, cls: 'p4', titles: ['Frontend craft, capstone starts','Real time, uploads, cold repo','Jobs, payments, webhooks','Performance and scale','Distributed systems','Security and code review'] },
+    { n: 4, cls: 'p5', titles: ['Building with LLMs','Retrieval and evaluation','Team sprint','Freeze and harden'] },
+    { n: 2, cls: 'p6', titles: ['Production readiness','Assess, defend, launch'] }
+  ];
+
+  const map = document.getElementById('map');
+  let wk = 0;
+  PHASES.forEach(p => p.titles.forEach(t => {
+    wk++;
+    const d = document.createElement('div');
+    d.className = 'cell ' + p.cls;
+    d.innerHTML = '<span class="w">' + String(wk).padStart(2, '0') + '</span><span class="t">' + t + '</span>';
+    map.appendChild(d);
+  }));
+
+  const ticksEl = document.getElementById('ticks');
+  const slides = [...document.querySelectorAll('section')];
+  slides.forEach((_, i) => {
+    const t = document.createElement('div');
+    t.className = 'tick' + (i >= 9 ? ' warm' : '');
+    ticksEl.appendChild(t);
+  });
+  const ticks = [...ticksEl.children];
+  const nowEl = document.getElementById('now');
+  const deck = document.getElementById('deck');
+
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const i = slides.indexOf(e.target);
+      ticks.forEach((t, j) => t.classList.toggle('on', j <= i));
+      nowEl.textContent = String(i + 1).padStart(2, '0');
+    });
+  }, { threshold: 0.55 });
+  slides.forEach(s => io.observe(s));
+
+  let idx = 0;
+  addEventListener('keydown', e => {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'PageDown' && e.key !== 'PageUp') return;
+    e.preventDefault();
+    idx = Math.max(0, Math.min(slides.length - 1, idx + (e.key === 'ArrowDown' || e.key === 'PageDown' ? 1 : -1)));
+    slides[idx].scrollIntoView({ behavior: 'smooth' });
+  });
+  deck.addEventListener('scroll', () => {
+    idx = Math.round(deck.scrollTop / innerHeight);
+    const h = document.getElementById('hint');
+    if (deck.scrollTop > 200) h.style.opacity = '0';
+  }, { passive: true });
+</script>
